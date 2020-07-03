@@ -9,6 +9,11 @@
 
         public static string GetFirstLetter(this string data)
         {
+            if(string.IsNullOrWhiteSpace(data))
+            {
+                return data;
+            }
+
             if(data.IndexOf(" ") != -1)
             {
                 var result = string.Empty;

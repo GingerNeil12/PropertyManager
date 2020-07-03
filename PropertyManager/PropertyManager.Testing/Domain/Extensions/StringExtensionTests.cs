@@ -25,5 +25,12 @@ namespace PropertyManager.Testing.Domain.Extensions
             var data = "hello world";
             Assert.AreEqual("H W", data.GetFirstLetter());
         }
+
+        [Test]
+        public void GetFirstLetter_WorksWithBlankString()
+        {
+            var data = string.Empty;
+            Assert.AreEqual(string.Empty, data.GetFirstLetter());
+        }
     }
 }
