@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using MediatR;
 
 namespace PropertyManager.ViewModels.Application.Landlords.Commands
 {
-    public class CreateLandlordNotifcation : INotification
+    public class CreateLandlordRequest : IRequest<string>
     {
-        [Required]
-        public string Id { get; set; }
-
         [StringLength(maximumLength: 10)]
         public string Title { get; set; }
 
@@ -47,6 +42,6 @@ namespace PropertyManager.ViewModels.Application.Landlords.Commands
         public string RegisterNumber { get; set; }
 
         [Required]
-        public DateTime Dob  { get; set; }
+        public DateTime Dob { get; set; }
     }
 }
