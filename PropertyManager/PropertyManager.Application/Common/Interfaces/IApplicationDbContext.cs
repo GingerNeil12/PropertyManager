@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PropertyManager.Domain.Models.Landlords;
 
@@ -12,6 +13,6 @@ namespace PropertyManager.Application.Common.Interfaces
         DbSet<LandlordContactAddress> LandlordContactAddresses { get; set; }
         DbSet<LandlordNote> LandlordNotes { get; set; }
 
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

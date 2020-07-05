@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ namespace PropertyManager.Infrastructure.Persistence
             base.OnModelCreating(builder);
         }
 
-        public Task<int> SaveChangesAsync()
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
             {
@@ -54,7 +55,7 @@ namespace PropertyManager.Infrastructure.Persistence
                         break;
                 }
             }
-            return SaveChangesAsync(new System.Threading.CancellationToken());
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }

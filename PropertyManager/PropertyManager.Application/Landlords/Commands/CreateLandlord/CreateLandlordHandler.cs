@@ -91,7 +91,7 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
         {
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {
