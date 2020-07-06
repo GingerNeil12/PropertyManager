@@ -34,32 +34,36 @@ namespace PropertyManager.Web.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(LoginViewModel model)
         {
-            try
+            if(ModelState.IsValid)
             {
-                var content = CreateContent(model);
-                var response = await HttpClient.PostAsync(Configuration["Url:Login"], content);
-                var responseBody = await response.Content.ReadAsStringAsync();
-                switch (response.StatusCode)
+                try
                 {
-                    case HttpStatusCode.OK:
-                        await OkResponse(responseBody);
-                        return RedirectToAction("Index", "Dashboard");
-                    case HttpStatusCode.BadRequest:
-                        BadRequestResponse(responseBody);
-                        return View(model);
-                    case HttpStatusCode.Unauthorized:
-                        UnauthorizedResponse(responseBody);
-                        return View(model);
-                    default:
-                        ViewData["Message"] = DEFAULT_ERROR;
-                        return View(model);
+                    var content = CreateContent(model);
+                    var response = await HttpClient.PostAsync(Configuration["Url:Login"], content);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.OK:
+                            await OkResponse(responseBody);
+                            return RedirectToAction("Index", "Dashboard");
+                        case HttpStatusCode.BadRequest:
+                            BadRequestResponse(responseBody);
+                            return View(model);
+                        case HttpStatusCode.Unauthorized:
+                            UnauthorizedResponse(responseBody);
+                            return View(model);
+                        default:
+                            ViewData["Message"] = DEFAULT_ERROR;
+                            return View(model);
+                    }
+                }
+                catch (Exception)
+                {
+                    ViewData["Message"] = DEFAULT_ERROR;
+                    return View(model);
                 }
             }
-            catch (Exception)
-            {
-                ViewData["Message"] = DEFAULT_ERROR;
-                return View(model);
-            }
+            return View(model);
         }
 
         [HttpGet]

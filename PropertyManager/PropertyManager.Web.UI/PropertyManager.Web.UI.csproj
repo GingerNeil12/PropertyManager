@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PropertyManager.Infrastructure.Security\PropertyManager.Infrastructure.Security.csproj" />
     <ProjectReference Include="..\PropertyManager.ResponseModels\PropertyManager.ResponseModels.csproj" />
     <ProjectReference Include="..\PropertyManager.ViewModels\PropertyManager.ViewModels.csproj" />
   </ItemGroup>
