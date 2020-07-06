@@ -9,7 +9,9 @@ using PropertyManager.Infrastructure;
 using PropertyManager.Infrastructure.Persistence;
 using PropertyManager.Infrastructure.Persistence.DataSeeding;
 using PropertyManager.Infrastructure.Security;
+using PropertyManager.Web.Api.Interfaces.Application;
 using PropertyManager.Web.Api.Interfaces.Security;
+using PropertyManager.Web.Api.Services.Application;
 using PropertyManager.Web.Api.Services.Common;
 using PropertyManager.Web.Api.Services.Security;
 
@@ -39,6 +41,7 @@ namespace PropertyManager.Web.Api
 
             // Project wide DI
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<ILandlordService, LandlordService>();
 
             services.AddControllers();
         }
@@ -59,6 +62,8 @@ namespace PropertyManager.Web.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Security;
-using PropertyManager.Web.Api.Extensions;
 using PropertyManager.Web.Api.FIlters;
 using PropertyManager.Web.Api.Interfaces.Security;
 
@@ -10,7 +8,7 @@ namespace PropertyManager.Web.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : BaseController
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -30,9 +28,7 @@ namespace PropertyManager.Web.Api.Controllers
                 var result = await _authenticationService.AuthenticateUserAsync(model);
                 return StatusCode(result.Status, result.Payload);
             }
-            return new BadRequestObjectResult(
-                new BadRequestApiResponse(
-                    ModelState.ConvertToDictionary()));
+            return GetBadRequetsResult();
         }
     }
 }

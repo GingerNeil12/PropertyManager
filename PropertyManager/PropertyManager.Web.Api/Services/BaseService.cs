@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using PropertyManager.Application.Exceptions;
 using PropertyManager.Infrastructure.Security.Exceptions;
 using PropertyManager.ResponseModels;
 
@@ -25,6 +26,10 @@ namespace PropertyManager.Web.Api.Services
                     return BadRequestResponse(identityValidation.Errors, identityValidation.Message);
                 case AccountLockedException accountLocked:
                     return UnauthorizedResponse(accountLocked.Message);
+                case ValidationException validation:
+                    return BadRequestResponse(validation.Errors, validation.Message);
+                case DbContextException dbContext:
+                    return InternalServerErrorResponse(dbContext.Message);
                 default:
                     return InternalServerErrorResponse();
             }
