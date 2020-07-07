@@ -4,6 +4,9 @@ for details on configuring this project to bundle and minify static web assets. 
 /*
     Custom site CSS
 */
+body {
+    background-color: #f4f4f4;
+}
 
 #form-login {
     width: 45%;
@@ -13,6 +16,10 @@ for details on configuring this project to bundle and minify static web assets. 
 #form-login input {
     background-color: #e6e6e6;
 }
+
+/*#form-landlord-create input {
+    background-color: #e6e6e6;
+}*/
 
 /*
     This stuff comes as standard

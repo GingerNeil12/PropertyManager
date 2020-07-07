@@ -42,6 +42,8 @@ namespace PropertyManager.ViewModels.Application.Landlords.Commands
         public string RegisterNumber { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{dd-MM-yyyy}")]
         public DateTime Dob { get; set; }
     }
 }

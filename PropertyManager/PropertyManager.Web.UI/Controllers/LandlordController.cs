@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using PropertyManager.Infrastructure.Security.Common;
+using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 
 namespace PropertyManager.Web.UI.Controllers
@@ -21,6 +23,14 @@ namespace PropertyManager.Web.UI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public IActionResult Details(string id)
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.ADMIN)]
         public IActionResult Create()
         {
             return View(new CreateLandlordRequest());
@@ -43,14 +53,19 @@ namespace PropertyManager.Web.UI.Controllers
                     switch(response.StatusCode)
                     {
                         case HttpStatusCode.Created:
-                            return View(request);
+                            var createdResult = Deserialize<CreatedApiResponse>(responseBody);
+                            return RedirectToAction("Details", new { id=createdResult.Id.ToString()});
                         case HttpStatusCode.BadRequest:
+                            var badRequestResult = Deserialize<BadRequestApiResponse>(responseBody);
+                            AddBadRequestErrorsToModelState(badRequestResult);
                             return View(request);
                         case HttpStatusCode.Unauthorized:
                             return View(request);
                         case HttpStatusCode.Forbidden:
                             return View(request);
                         case HttpStatusCode.InternalServerError:
+                            var internalServerResult = Deserialize<InternalServerErrorApiResponse>(responseBody);
+                            ViewData["Message"] = internalServerResult.Status;
                             return View(request);
                         default:
                             ViewData["Message"] = UNABLE_CREATE_LANDLORD;
