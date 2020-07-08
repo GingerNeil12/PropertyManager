@@ -3,6 +3,8 @@ using System.Data;
 using System.Linq;
 using FluentValidation;
 using PropertyManager.Application.Common.Interfaces;
+using PropertyManager.Domain.Enums;
+using PropertyManager.Domain.Models.Landlords;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 
 namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
@@ -43,8 +45,9 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
                     .Where(x => x.Email.Equals(email))
                     .FirstOrDefault();
 
-                    if (result != null)
+                    if (IsActiveOrArchivedLandlordRecord(result))
                     {
+
                         context.AddFailure("Email already in use.");
                     }
                 });
@@ -69,11 +72,16 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
                     .Where(x => x.RegsiterNumber.Equals(number))
                     .FirstOrDefault();
 
-                    if (result != null)
+                    if (IsActiveOrArchivedLandlordRecord(result))
                     {
                         context.AddFailure("Register Number already in use.");
                     }
                 });
+        }
+
+        private bool IsActiveOrArchivedLandlordRecord(Landlord landlord)
+        {
+            return landlord != null && landlord.ActiveStatus != ActiveStatus.DELETED;
         }
 
         private bool BeBeforeCurrentDate(DateTime date)
