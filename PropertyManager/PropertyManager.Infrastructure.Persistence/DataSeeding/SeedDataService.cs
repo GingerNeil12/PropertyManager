@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.Infrastructure.Security.Models;
@@ -37,6 +38,18 @@ namespace PropertyManager.Infrastructure.Persistence.DataSeeding
                 var role = new IdentityRole(RoleNames.USER);
                 await _roleManager.CreateAsync(role);
             }
+
+            if(!await _roleManager.RoleExistsAsync(RoleNames.MANAGER))
+            {
+                var role = new IdentityRole(RoleNames.MANAGER);
+                await _roleManager.CreateAsync(role);
+            }
+
+            if (!await _roleManager.RoleExistsAsync(RoleNames.ASSOCIATE))
+            {
+                var role = new IdentityRole(RoleNames.ASSOCIATE);
+                await _roleManager.CreateAsync(role);
+            }
         }
 
         private async Task SeedUsersAsync()
@@ -60,6 +73,32 @@ namespace PropertyManager.Infrastructure.Persistence.DataSeeding
                 {
                     await _userManager.AddToRoleAsync(user, RoleNames.ADMIN);
                     await _userManager.AddToRoleAsync(user, RoleNames.USER);
+                }
+            }
+
+            var superEmail = "super@property.com";
+            user = await _userManager.FindByEmailAsync(superEmail);
+            if(user == null)
+            {
+                user = new ApplicationUser()
+                {
+                    Email = superEmail,
+                    UserName = superEmail,
+                    FirstName = "Super",
+                    LastName = "User"
+                };
+
+                var created = await _userManager.CreateAsync(user, password);
+                if (created.Succeeded)
+                {
+                    var roles = new List<string>()
+                    {
+                        RoleNames.USER,
+                        RoleNames.ASSOCIATE,
+                        RoleNames.MANAGER,
+                        RoleNames.ADMIN
+                    };
+                    await _userManager.AddToRolesAsync(user, roles);
                 }
             }
         }

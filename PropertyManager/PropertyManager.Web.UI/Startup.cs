@@ -78,11 +78,6 @@ namespace PropertyManager.Web.UI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "landlord",
-                    pattern: "landlord/{id}",
-                    defaults: new { controller = "Landlord", action = "details" });
-
-                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
