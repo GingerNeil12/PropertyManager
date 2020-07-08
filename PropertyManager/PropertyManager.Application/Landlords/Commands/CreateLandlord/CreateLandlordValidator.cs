@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using FluentValidation;
 using PropertyManager.Application.Common.Interfaces;
@@ -56,6 +57,7 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
                 .MaximumLength(20);
 
             RuleFor(x => x.Dob)
+                .Must(BeBeforeCurrentDate).WithMessage("Dob cannot be in the future.")
                 .NotNull();
 
             RuleFor(x => x.RegisterNumber)
@@ -72,6 +74,11 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
                         context.AddFailure("Register Number already in use.");
                     }
                 });
+        }
+
+        private bool BeBeforeCurrentDate(DateTime date)
+        {
+            return DateTime.Now > date;
         }
     }
 }
