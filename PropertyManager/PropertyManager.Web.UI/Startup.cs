@@ -74,11 +74,12 @@ namespace PropertyManager.Web.UI
 
             app.UseAuthorization();
 
+            // TODO: Fix this
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "landlord",
-                    pattern: "landlord/{id?}",
+                    pattern: "landlord/{id}",
                     defaults: new { controller = "Landlord", action = "details" });
 
                 endpoints.MapControllerRoute(

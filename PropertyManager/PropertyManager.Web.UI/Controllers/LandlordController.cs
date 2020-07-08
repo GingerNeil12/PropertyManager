@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +23,13 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNames.ADMIN)]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.ADMIN)]
         public IActionResult Details(string id)
         {
             return View();
@@ -40,21 +46,21 @@ namespace PropertyManager.Web.UI.Controllers
         [Authorize(Roles = RoleNames.ADMIN)]
         public async Task<IActionResult> Create(CreateLandlordRequest request)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     var content = CreateContent(request);
                     HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
                     var response = await HttpClient.PostAsync(
-                        Configuration["Url:CreateLandlord"], 
+                        Configuration["Url:CreateLandlord"],
                         content);
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    switch(response.StatusCode)
+                    switch (response.StatusCode)
                     {
                         case HttpStatusCode.Created:
                             var createdResult = Deserialize<CreatedApiResponse>(responseBody);
-                            return RedirectToAction("Details", new { id=createdResult.Id.ToString()});
+                            return RedirectToAction("Details", new { id = createdResult.Id.ToString() });
                         case HttpStatusCode.BadRequest:
                             var badRequestResult = Deserialize<BadRequestApiResponse>(responseBody);
                             AddBadRequestErrorsToModelState(badRequestResult);
