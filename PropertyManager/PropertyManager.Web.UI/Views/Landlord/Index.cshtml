@@ -1,5 +1,65 @@
-﻿@{
+﻿@using PropertyManager.Domain.Enums
+@model PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords.LandlordsViewModel
+@{
     ViewData["Title"] = "Index";
 }
 
 <h1>Index</h1>
+
+<span class="text-danger">
+    @ViewData["Message"]
+</span>
+
+
+<!-- Filter Stuff goes here -->
+<table class="mt-3 table">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Mobile</th>
+            <th scope="col">Home Phone</th>
+            <th scope="col">Register Number</th>
+            <th scope="col">Approv. Status</th>
+            <th scope="col">Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var landlord in Model.Landlords)
+        {
+            <tr>
+                <td>@landlord.FullName</td>
+                <td>@landlord.Email</td>
+                <td>@landlord.MobilePhone</td>
+                <td>@landlord.HomePhone</td>
+                <td>@landlord.RegisterNumber</td>
+                <td>
+                    @if(landlord.ApprovalStatus == ApprovalStatus.APPROVED.ToString())
+                    {
+                        <span class="badge badge-success badge-pill">
+                            @landlord.ApprovalStatus
+                        </span>
+                    }
+                    else if(landlord.ApprovalStatus == ApprovalStatus.SUBMITTED.ToString())
+                    {
+                        <span class="badge badge-info badge-pill">
+                            @landlord.ApprovalStatus
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger badge-pill">
+                            @landlord.ApprovalStatus
+                        </span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="details" asp-controller="landlord" asp-route-id="@landlord.Id">
+                        View
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Pagination stuff goes here -->

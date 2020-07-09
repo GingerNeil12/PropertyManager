@@ -37,6 +37,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
                                    HomePhone = landlord.HomePhone,
                                    Email = landlord.Email,
                                    ApprovalStatus = approval.ApprovalStatus.ToString(),
+                                   RegisterNumber = landlord.RegsiterNumber,
                                    FullName = NameHelper.FormatFullName(
                                        landlord.FirstName,
                                        landlord.LastName,

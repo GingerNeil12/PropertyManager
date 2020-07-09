@@ -8,5 +8,6 @@
         public string MobilePhone { get; set; }
         public string HomePhone { get; set; }
         public string ApprovalStatus { get; set; }
+        public string RegisterNumber { get; set; }
     }
 }
