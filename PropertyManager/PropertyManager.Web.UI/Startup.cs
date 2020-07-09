@@ -74,7 +74,6 @@ namespace PropertyManager.Web.UI
 
             app.UseAuthorization();
 
-            // TODO: Fix this
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
