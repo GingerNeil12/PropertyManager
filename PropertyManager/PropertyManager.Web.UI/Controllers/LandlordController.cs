@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,8 +10,6 @@ using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
-using PropertyManager.ViewModels.Security;
-using PropertyManager.Web.UI.Models;
 
 namespace PropertyManager.Web.UI.Controllers
 {
@@ -55,12 +52,18 @@ namespace PropertyManager.Web.UI.Controllers
                 var url = $"{Configuration["Url:UserLandlords"]}/{GetUserId()}";
                 var response = await HttpClient.PostAsync(url, content);
                 var responseBody = await response.Content.ReadAsStringAsync();
-                switch(response.StatusCode)
+                switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
                         var okResponse = Deserialize<OkApiResponse>(responseBody);
                         var data = Deserialize<LandlordsViewModel>(okResponse.Result.ToString());
-                        return Json(new { draw = draw, recordsFiltered = data.TotalRecords, recordsTotal = data.TotalRecords, data = data.Landlords });
+                        return Json(new
+                        {
+                            draw,
+                            recordsFiltered = data.TotalRecords,
+                            recordsTotal = data.TotalRecords,
+                            data = data.Landlords
+                        });
                     default:
                         return null;
                 }
@@ -143,7 +146,7 @@ namespace PropertyManager.Web.UI.Controllers
             var skip = start != null ? Convert.ToInt32(start) : 0;
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
 
-            if(sortColumn == "LandlordId")
+            if (sortColumn == "LandlordId")
             {
                 sortColumn = "LastName";
             }

@@ -40,19 +40,18 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
                                    ApprovalStatus = approval.ApprovalStatus.ToString()
                                };
 
-            if (!(string.IsNullOrWhiteSpace(request.Filters.SortColumn) && string.IsNullOrWhiteSpace(request.Filters.SortDirection)))
+            var sortColumn = request.Filters.SortColumn;
+            var sortDirection = request.Filters.SortDirection;
+            if (!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
             {
-                landlordsDto = landlordsDto.OrderBy(request.Filters.SortColumn + " " + request.Filters.SortDirection);
+                landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
             }
 
-            var searchValue = request.Filters.SearchValue;
+            var searchValue = request.Filters.SearchValue?.ToUpper();
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
                 landlordsDto = landlordsDto.Where(
-                    x => x.LastName.ToUpper().Contains(searchValue.ToUpper()) ||
-                    x.Email.ToUpper().Contains(searchValue.ToUpper()) ||
-                    x.RegisterNumber.ToUpper().Contains(searchValue.ToUpper()) ||
-                    x.ApprovalStatus.ToUpper().Contains(searchValue.ToUpper()));
+                    x => x.LastName.ToUpper().Contains(searchValue));
             }
 
             var totalRecords = landlordsDto.Count();
@@ -63,6 +62,21 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
                 TotalRecords = totalRecords
             };
             return result;
+        }
+
+        private bool IsSortColumnAndDirectionEmpty(string sortColumn, string sortDirection)
+        {
+            return IsSortColumnEmpty(sortColumn) && IsSortDirectionEmpty(sortDirection);
+        }
+
+        private bool IsSortColumnEmpty(string sortColumn)
+        {
+            return string.IsNullOrWhiteSpace(sortColumn);
+        }
+
+        private bool IsSortDirectionEmpty(string sortDirection)
+        {
+            return string.IsNullOrWhiteSpace(sortDirection);
         }
     }
 }
