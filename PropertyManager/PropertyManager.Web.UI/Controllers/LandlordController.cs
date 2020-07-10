@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -53,7 +54,7 @@ namespace PropertyManager.Web.UI.Controllers
                 {
                     case HttpStatusCode.OK:
                         var okResponse = Deserialize<OkApiResponse>(responseBody);
-                        var data = Deserialize<LandlordsViewModel>(okResponse.Result.ToString());
+                        var data = Deserialize<UserLandlordsViewModel>(okResponse.Result.ToString());
                         return Json(new
                         {
                             draw,
@@ -61,8 +62,15 @@ namespace PropertyManager.Web.UI.Controllers
                             recordsTotal = data.TotalRecords,
                             data = data.Landlords
                         });
+                    case HttpStatusCode.InternalServerError:
                     default:
-                        return null;
+                        return Json(new 
+                        {
+                            draw,
+                            recordsFiltered = 0,
+                            recordsTotal = 0,
+                            data = GetEmptyUserLandlordsViewModel().Landlords
+                        });
                 }
             }
             catch (Exception)
@@ -156,6 +164,15 @@ namespace PropertyManager.Web.UI.Controllers
                 SearchValue = searchValue
             };
             return result;
+        }
+
+        private UserLandlordsViewModel GetEmptyUserLandlordsViewModel()
+        {
+            return new UserLandlordsViewModel()
+            {
+                Landlords = new List<LandlordsDto>(),
+                TotalRecords = 0
+            };
         }
     }
 }

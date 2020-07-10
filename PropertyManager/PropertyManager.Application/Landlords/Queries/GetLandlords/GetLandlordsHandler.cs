@@ -10,7 +10,7 @@ using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 namespace PropertyManager.Application.Landlords.Queries.GetLandlords
 {
     public class GetLandlordsHandler
-        : IRequestHandler<GetLandlordsRequest, LandlordsViewModel>
+        : IRequestHandler<GetLandlordsRequest, UserLandlordsViewModel>
     {
         private readonly IApplicationDbContext _context;
 
@@ -19,7 +19,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
             _context = context;
         }
 
-        public async Task<LandlordsViewModel> Handle(
+        public async Task<UserLandlordsViewModel> Handle(
             GetLandlordsRequest request,
             CancellationToken cancellationToken)
         {
@@ -67,7 +67,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
 
             var totalRecords = landlordsDto.Count();
             landlordsDto = landlordsDto.Skip(request.Filters.Skip).Take(request.Filters.PageSize);
-            var result = new LandlordsViewModel()
+            var result = new UserLandlordsViewModel()
             {
                 Landlords = landlordsDto,
                 TotalRecords = totalRecords

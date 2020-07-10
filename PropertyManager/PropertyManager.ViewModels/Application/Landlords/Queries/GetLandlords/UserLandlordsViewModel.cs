@@ -2,7 +2,7 @@
 
 namespace PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords
 {
-    public class LandlordsViewModel
+    public class UserLandlordsViewModel
     {
         public IEnumerable<LandlordsDto> Landlords { get; set; }
         public int TotalRecords { get; set; }
