@@ -42,17 +42,17 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
 
             var sortColumn = request.Filters.SortColumn;
             var sortDirection = request.Filters.SortDirection;
-            if (sortColumn == "ApprovalStatus")
+            if(!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
             {
-                landlordsDto = landlordsDto.OrderBy(x => x.ApprovalStatus);
-                if (sortDirection != "asc")
+                if(sortColumn == "ApprovalStatus")
                 {
-                    landlordsDto = landlordsDto.OrderByDescending(x => x.ApprovalStatus);
+                    landlordsDto = landlordsDto.OrderBy(x => x.ApprovalStatus);
+                    if(sortDirection != "asc")
+                    {
+                        landlordsDto = landlordsDto.OrderByDescending(x => x.ApprovalStatus);
+                    }
                 }
-            }
-            else
-            {
-                if (!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
+                else
                 {
                     landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
                 }
@@ -62,7 +62,8 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
                 landlordsDto = landlordsDto.Where(
-                    x => x.LastName.ToUpper().Contains(searchValue));
+                    x => x.LastName.ToUpper().Contains(searchValue) ||
+                    x.FirstName.ToUpper().Contains(searchValue));
             }
 
             var totalRecords = landlordsDto.Count();

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
+using PropertyManager.ViewModels.Application.Common;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 

@@ -21,13 +21,14 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            var landlordId = $('#balh').val();
             $('#landlordsTable').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "filter": true,
                 "orderMulti": false,
                 "language": {
-                    "search": "Search Last Name"
+                    "search": "Search Name"
                 },
                 "ajax": {
                     "url": "/Landlord/LoadIndexData",
