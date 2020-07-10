@@ -1,4 +1,4 @@
-﻿namespace PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords
+﻿namespace PropertyManager.ViewModels.Application.Common
 {
     public class FilterDto
     {

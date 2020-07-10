@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PropertyManager.ViewModels.Application.Common;
 
 namespace PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords
 {
