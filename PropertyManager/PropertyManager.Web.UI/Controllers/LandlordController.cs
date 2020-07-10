@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using PropertyManager.Domain.Enums;
 using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Common;
@@ -35,7 +36,7 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public async Task<IActionResult> LoadIndexData()
+        public async Task<IActionResult> LoadIndexData(string approvalStatus)
         {
             try
             {
@@ -44,6 +45,7 @@ namespace PropertyManager.Web.UI.Controllers
                 var request = new GetLandlordsRequest()
                 {
                     UserId = GetUserId(),
+                    ApprovalStatus = (ApprovalStatus)Enum.Parse(typeof(ApprovalStatus), approvalStatus),
                     Filters = CreateFilterDto()
                 };
                 var content = CreateContent(request);
