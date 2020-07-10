@@ -28,6 +28,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
                                on landlord.Id equals approval.LandlordId
                                where landlord.CreatedBy == request.UserId
                                && landlord.ActiveStatus == ActiveStatus.ACTIVE
+                               && approval.ApprovalStatus == request.ApprovalStatus
                                select new LandlordsDto()
                                {
                                    LandlordId = landlord.Id,
@@ -44,18 +45,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
             var sortDirection = request.Filters.SortDirection;
             if(!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
             {
-                if(sortColumn == "ApprovalStatus")
-                {
-                    landlordsDto = landlordsDto.OrderBy(x => x.ApprovalStatus);
-                    if(sortDirection != "asc")
-                    {
-                        landlordsDto = landlordsDto.OrderByDescending(x => x.ApprovalStatus);
-                    }
-                }
-                else
-                {
-                    landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
-                }
+                landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
             }
 
             var searchValue = request.Filters.SearchValue?.ToUpper();
