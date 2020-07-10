@@ -1,10 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@using PropertyManager.Infrastructure.Security.Common
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] | PropertyManager</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/datatables/css/jquery.dataTables.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
@@ -43,7 +46,12 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="landlordDropdown">
                                     <a class="dropdown-item" asp-controller="landlord" asp-action="create">Create</a>
-                                    <a class="dropdown-item" asp-controller="landlord" asp-action="index">View</a>
+                                    <a class="dropdown-item" asp-controller="landlord" asp-action="index">View All</a>
+                                    @if (User.IsInRole(RoleNames.MANAGER))
+                                    {
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" asp-controller="landlord" asp-action="manage">Manage</a>
+                                    }
                                 </div>
                             </li>
                         </ul>
@@ -74,6 +82,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
+using PropertyManager.ViewModels.Security;
+using PropertyManager.Web.UI.Models;
 
 namespace PropertyManager.Web.UI.Controllers
 {
@@ -29,14 +32,23 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public async Task<IActionResult> LoadIndexData()
         {
             try
             {
+                var draw = Request.Form["draw"].FirstOrDefault();
+
                 var request = new GetLandlordsRequest()
                 {
-                    PageSize = PAGE_SIZE,
-                    UserId = GetUserId()
+                    UserId = GetUserId(),
+                    Filters = CreateFilterDto()
                 };
                 var content = CreateContent(request);
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
@@ -47,23 +59,16 @@ namespace PropertyManager.Web.UI.Controllers
                 {
                     case HttpStatusCode.OK:
                         var okResponse = Deserialize<OkApiResponse>(responseBody);
-                        var landlordsViewModel = Deserialize<LandlordsViewModel>(
-                            okResponse.Result.ToString());
-                        return View(landlordsViewModel);
-                    case HttpStatusCode.Unauthorized:
-                        return View(CreateEmptyLandlordsVM());
-                    case HttpStatusCode.Forbidden:
-                        return View(CreateEmptyLandlordsVM());
-                    case HttpStatusCode.InternalServerError:
+                        var data = Deserialize<LandlordsViewModel>(okResponse.Result.ToString());
+                        return Json(new { draw = draw, recordsFiltered = data.TotalRecords, recordsTotal = data.TotalRecords, data = data.Landlords });
                     default:
-                        ViewData["Message"] = UNABLE_TO_LOAD_LANDLORDS;
-                        return View(CreateEmptyLandlordsVM());
+                        return null;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ViewData["Message"] = UNABLE_TO_LOAD_LANDLORDS;
-                return View(CreateEmptyLandlordsVM());
+                // Do something better here
+                throw;
             }
         }
 
@@ -125,24 +130,33 @@ namespace PropertyManager.Web.UI.Controllers
             }
             return View(request);
         }
-    
-        private LandlordsViewModel CreateEmptyLandlordsVM()
+
+        private FilterDto CreateFilterDto()
         {
-            var filterDto = new FilterDto()
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            var orderColumn = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + orderColumn + "][name]"].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value"].FirstOrDefault();
+
+            var skip = start != null ? Convert.ToInt32(start) : 0;
+            var pageSize = length != null ? Convert.ToInt32(length) : 0;
+
+            if(sortColumn == "LandlordId")
             {
-                ApprovalStatus = new ApprovalStatusDto(),
-                ApprovalStatuses = new List<ApprovalStatusDto>()
-            };
-            var landlords = new List<LandlordsDto>();
-            return new LandlordsViewModel()
+                sortColumn = "LastName";
+            }
+
+            var result = new FilterDto()
             {
-                Filter = filterDto,
-                Landlords = landlords,
-                PageNumber = 0,
-                PageSize = 0,
-                TotalPages = 0,
-                TotalRecords = 0
+                Skip = skip,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortDirection = sortColumnDirection,
+                SearchValue = searchValue
             };
+            return result;
         }
     }
 }

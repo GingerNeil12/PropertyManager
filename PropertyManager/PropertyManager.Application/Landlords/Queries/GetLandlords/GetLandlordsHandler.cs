@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using PropertyManager.Application.Common.Helpers;
 using PropertyManager.Application.Common.Interfaces;
 using PropertyManager.Domain.Enums;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
@@ -27,68 +26,42 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
             var landlordsDto = from landlord in _context.Landlords
                                join approval in _context.LandlordApprovalRecords
                                on landlord.Id equals approval.LandlordId
-                               where landlord.CreatedBy == request.UserId 
+                               where landlord.CreatedBy == request.UserId
                                && landlord.ActiveStatus == ActiveStatus.ACTIVE
-                               orderby landlord.LastName ascending
                                select new LandlordsDto()
                                {
-                                   Id = landlord.Id,
+                                   LandlordId = landlord.Id,
+                                   Email = landlord.Email,
+                                   FirstName = landlord.FirstName,
+                                   LastName = landlord.LastName,
                                    MobilePhone = landlord.MobilePhone,
                                    HomePhone = landlord.HomePhone,
-                                   Email = landlord.Email,
-                                   ApprovalStatus = approval.ApprovalStatus.ToString(),
                                    RegisterNumber = landlord.RegsiterNumber,
-                                   FullName = NameHelper.FormatFullName(
-                                       landlord.FirstName,
-                                       landlord.LastName,
-                                       landlord.Title,
-                                       landlord.MiddleNames)
+                                   ApprovalStatus = approval.ApprovalStatus.ToString()
                                };
 
+            if (!(string.IsNullOrWhiteSpace(request.Filters.SortColumn) && string.IsNullOrWhiteSpace(request.Filters.SortDirection)))
+            {
+                landlordsDto = landlordsDto.OrderBy(request.Filters.SortColumn + " " + request.Filters.SortDirection);
+            }
+
+            var searchValue = request.Filters.SearchValue;
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                landlordsDto = landlordsDto.Where(
+                    x => x.LastName.ToUpper().Contains(searchValue.ToUpper()) ||
+                    x.Email.ToUpper().Contains(searchValue.ToUpper()) ||
+                    x.RegisterNumber.ToUpper().Contains(searchValue.ToUpper()) ||
+                    x.ApprovalStatus.ToUpper().Contains(searchValue.ToUpper()));
+            }
+
             var totalRecords = landlordsDto.Count();
-
-            landlordsDto = landlordsDto.Skip(0).Take(request.PageSize);
-
-            var filterDto = GetFilterDto();
-
+            landlordsDto = landlordsDto.Skip(request.Filters.Skip).Take(request.Filters.PageSize);
             var result = new LandlordsViewModel()
             {
-                Filter = filterDto,
                 Landlords = landlordsDto,
-                PageNumber = 1,
-                PageSize = request.PageSize,
-                TotalRecords = totalRecords,
-                TotalPages = (totalRecords + request.PageSize - 1) / request.PageSize
+                TotalRecords = totalRecords
             };
-
-            return result;
-        }
-
-        private FilterDto GetFilterDto()
-        {
-            var approvalStatusDto = new ApprovalStatusDto()
-            {
-                Value = (int)ApprovalStatus.APPROVED,
-                Name = ApprovalStatus.APPROVED.ToString()
-            };
-
-            var approvalStatuses = Enum.GetValues(typeof(ApprovalStatus))
-                .Cast<ApprovalStatus>()
-                .Select(x => new ApprovalStatusDto()
-                {
-                    Value = (int)x,
-                    Name = x.ToString()
-                });
-
-            var result = new FilterDto()
-            {
-                Name = string.Empty,
-                Email = string.Empty,
-                RegisterNumber = string.Empty,
-                ApprovalStatus = approvalStatusDto,
-                ApprovalStatuses = approvalStatuses
-            };
-
             return result;
         }
     }

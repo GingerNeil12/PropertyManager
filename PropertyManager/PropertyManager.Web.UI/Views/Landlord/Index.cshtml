@@ -1,5 +1,4 @@
 ﻿@using PropertyManager.Domain.Enums
-@model PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords.LandlordsViewModel
 @{
     ViewData["Title"] = "Index";
 }
@@ -10,74 +9,62 @@
     @ViewData["Message"]
 </span>
 
-
-<!-- Filter Stuff goes here -->
-<table class="mt-3 table">
+<table class="mt-3 table-striped table-bordered" id="landlordsTable">
     <thead class="thead-light">
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Mobile</th>
-            <th scope="col">Home Phone</th>
-            <th scope="col">Register Number</th>
-            <th scope="col">Approv. Status</th>
-            <th scope="col">Options</th>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>LastName</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Home Phone</th>
+            <th>Register Number</th>
+            <th>Approv. Status</th>
         </tr>
     </thead>
-    <tbody>
-        @foreach(var landlord in Model.Landlords)
-        {
-            <tr>
-                <td>@landlord.FullName</td>
-                <td>@landlord.Email</td>
-                <td>@landlord.MobilePhone</td>
-                <td>@landlord.HomePhone</td>
-                <td>@landlord.RegisterNumber</td>
-                <td>
-                    @if(landlord.ApprovalStatus == ApprovalStatus.APPROVED.ToString())
-                    {
-                        <span class="badge badge-success badge-pill">
-                            @landlord.ApprovalStatus
-                        </span>
-                    }
-                    else if(landlord.ApprovalStatus == ApprovalStatus.SUBMITTED.ToString())
-                    {
-                        <span class="badge badge-info badge-pill">
-                            @landlord.ApprovalStatus
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge badge-danger badge-pill">
-                            @landlord.ApprovalStatus
-                        </span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="details" asp-controller="landlord" asp-route-id="@landlord.Id">
-                        View
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
 </table>
-<nav aria-label="landlordSearchResults">
-    <ul class="pagination">
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            if (i == Model.PageNumber)
-            {
-                <li class="page-item active">
-                    <a class="page-link" href="#">@i</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item">
-                    <a class="page-link" href="#">@i</a>
-                </li>
-            }
-        }
-    </ul>
-</nav>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+        $('#landlordsTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": true,
+            "ajax": {
+                "url": "/Landlord/LoadIndexData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columnDefs":[{
+                "targets": [0],
+                "visible": false,
+                "searchable": false
+            }],
+            "columns": [
+                { "data": "landlordId", "name": "LandlordId", "autoWidth": true },
+                { "data": "firstName", "name": "FirstName", "autoWidth": true },
+                { "data": "lastName", "name": "LastName", "autoWidth": true },
+                { "data": "email", "name": "Email", "autoWidth": true },
+                { "data": "mobilePhone", "name": "MobilePhone", "autoWidth": true },
+                { "data": "homePhone", "name": "HomePhone", "autoWidth": true },
+                { "data": "registerNumber", "name": "RegisterNumber", "autoWidth": true },
+                //{ "data": "approvalStatus", "name": "ApprovalStatus", "autoWidth": true },
+                {
+                    "render": function (data, type, full, meta)
+                    {
+                        if (full.approvalStatus === 'SUBMITTED') {
+                            return '<span class="badge badge-info badge-pill">Submitted</span>'
+                        } else if (full.approvalStatus === 'APPROVED') {
+                            return '<span class="badge badge-success badge-pill">Approved</span>'
+                        } else {
+                            return '<span class="badge badge-danger badge-pill">Rejected</span>'
+                        }
+                    }
+                }
+            ]
+        });
+    });
+</script>
+}
