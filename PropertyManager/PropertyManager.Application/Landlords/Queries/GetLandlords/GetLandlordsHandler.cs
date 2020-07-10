@@ -37,14 +37,25 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlords
                                    MobilePhone = landlord.MobilePhone,
                                    HomePhone = landlord.HomePhone,
                                    RegisterNumber = landlord.RegsiterNumber,
-                                   ApprovalStatus = approval.ApprovalStatus.ToString()
+                                   ApprovalStatus = approval.ApprovalStatus
                                };
 
             var sortColumn = request.Filters.SortColumn;
             var sortDirection = request.Filters.SortDirection;
-            if (!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
+            if (sortColumn == "ApprovalStatus")
             {
-                landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
+                landlordsDto = landlordsDto.OrderBy(x => x.ApprovalStatus);
+                if (sortDirection != "asc")
+                {
+                    landlordsDto = landlordsDto.OrderByDescending(x => x.ApprovalStatus);
+                }
+            }
+            else
+            {
+                if (!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
+                {
+                    landlordsDto = landlordsDto.OrderBy(sortColumn + " " + sortDirection);
+                }
             }
 
             var searchValue = request.Filters.SearchValue?.ToUpper();

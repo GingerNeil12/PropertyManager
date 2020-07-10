@@ -16,9 +16,6 @@ namespace PropertyManager.Web.UI.Controllers
     public class LandlordController : AuthController
     {
         private const string UNABLE_CREATE_LANDLORD = "Unable to create landlord. Try again later.";
-        private const string UNABLE_TO_LOAD_LANDLORDS = "Unable to load landlords. Try again later.";
-
-        private const int PAGE_SIZE = 10;
 
         public LandlordController(
             IHttpClientFactory httpClientFactory,
@@ -70,7 +67,6 @@ namespace PropertyManager.Web.UI.Controllers
             }
             catch (Exception)
             {
-                // Do something better here
                 throw;
             }
         }
@@ -141,7 +137,7 @@ namespace PropertyManager.Web.UI.Controllers
             var orderColumn = Request.Form["order[0][column]"].FirstOrDefault();
             var sortColumn = Request.Form["columns[" + orderColumn + "][name]"].FirstOrDefault();
             var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
             var skip = start != null ? Convert.ToInt32(start) : 0;
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
