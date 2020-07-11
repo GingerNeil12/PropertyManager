@@ -12,6 +12,7 @@ using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Common;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 
 namespace PropertyManager.Web.UI.Controllers
@@ -86,6 +87,16 @@ namespace PropertyManager.Web.UI.Controllers
         [Authorize(Roles = RoleNames.ADMIN)]
         public IActionResult Details(string id)
         {
+            try
+            {
+                HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             return View();
         }
 

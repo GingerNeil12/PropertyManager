@@ -58,11 +58,11 @@ namespace PropertyManager.Web.Api.Controllers
         [HttpGet]
         [Route("{id}")]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public async Task<IActionResult> GetLandlordDetailsAsync(
-            [FromBody] GetLandlordDetailRequest request)
+        public async Task<IActionResult> GetLandlordDetailsAsync(string id)
         {
             if (ModelState.IsValid)
             {
+                var request = new GetLandlordDetailRequest() { LandlordId = id };
                 var result = await _landlordService.GetLandlordDetailsAsync(request);
                 return StatusCode(result.Status, result.Payload);
             }
