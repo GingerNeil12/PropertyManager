@@ -4,6 +4,7 @@
     {
         public string LandlordId { get; set; }
         public string FullName { get; set; }
+        public string FullNameExtended { get; set; }
         public string Email { get; set; }
         public string MobilePhone { get; set; }
         public string HomePhone { get; set; }

@@ -42,7 +42,12 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlordDetails
                               RegisterNumber = landlord.RegsiterNumber,
                               ActiveStatus = landlord.ActiveStatus.ToString(),
                               ApprovalStatus = approval.ApprovalStatus.ToString(),
-                              FullName = NameHelper.FormatFullName(
+                              FullName = NameHelper.FormatFullNameShort(
+                                  landlord.FirstName,
+                                  landlord.LastName,
+                                  landlord.Title,
+                                  landlord.MiddleNames),
+                              FullNameExtended = NameHelper.FormatFullNameExtended(
                                   landlord.FirstName,
                                   landlord.LastName,
                                   landlord.Title,

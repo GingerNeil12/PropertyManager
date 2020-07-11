@@ -18,7 +18,7 @@ namespace PropertyManager.Infrastructure.Security.Services
         public async Task<string> GetUsersNameByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            return NameHelper.FormatFullName(user.FirstName, user.LastName);
+            return NameHelper.FormatFullNameShort(user.FirstName, user.LastName);
         }
     }
 }
