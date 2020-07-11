@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PropertyManager.Infrastructure.Security.Common;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 using PropertyManager.Web.Api.Interfaces.Application;
 
@@ -30,7 +31,7 @@ namespace PropertyManager.Web.Api.Controllers
                 var result = await _landlordService.CreateLandlordAsync(request);
                 return StatusCode(result.Status, result.Payload);
             }
-            return GetBadRequetsResult();
+            return GetBadRequestResult();
         }
 
         [HttpPost]
@@ -51,7 +52,21 @@ namespace PropertyManager.Web.Api.Controllers
                 var result = await _landlordService.GetLandlordsForUserAsync(request);
                 return StatusCode(result.Status, result.Payload);
             }
-            return GetBadRequetsResult();
+            return GetBadRequestResult();
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public async Task<IActionResult> GetLandlordDetailsAsync(
+            [FromBody] GetLandlordDetailRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _landlordService.GetLandlordDetailsAsync(request);
+                return StatusCode(result.Status, result.Payload);
+            }
+            return GetBadRequestResult();
         }
     }
 }

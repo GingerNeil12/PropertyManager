@@ -28,7 +28,7 @@ namespace PropertyManager.Web.Api.Controllers
                 var result = await _authenticationService.AuthenticateUserAsync(model);
                 return StatusCode(result.Status, result.Payload);
             }
-            return GetBadRequetsResult();
+            return GetBadRequestResult();
         }
     }
 }

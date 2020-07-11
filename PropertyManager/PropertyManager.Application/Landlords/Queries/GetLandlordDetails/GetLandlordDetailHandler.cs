@@ -51,7 +51,7 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlordDetails
 
             if (result == null)
             {
-                throw new NotFoundException();
+                throw new NotFoundException("Unable to find Landlord.");
             }
 
             var approvalRecord = _context.LandlordApprovalRecords

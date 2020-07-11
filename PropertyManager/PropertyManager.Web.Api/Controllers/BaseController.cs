@@ -5,7 +5,7 @@ namespace PropertyManager.Web.Api.Controllers
 {
     public abstract class BaseController : ControllerBase
     {
-        protected BadRequestObjectResult GetBadRequetsResult()
+        protected BadRequestObjectResult GetBadRequestResult()
         {
             return new BadRequestObjectResult(ModelState.ConvertToDictionary());
         }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 using PropertyManager.Web.Api.Interfaces.Application;
 
@@ -22,6 +23,19 @@ namespace PropertyManager.Web.Api.Services.Application
             {
                 var result = await Mediator.Send(request);
                 return CreatedResponse(result, "Landlord Created.");
+            }
+            catch (Exception ex)
+            {
+                return GetResponseMessageForException(ex);
+            }
+        }
+
+        public async Task<ResponseMessage> GetLandlordDetailsAsync(GetLandlordDetailRequest request)
+        {
+            try
+            {
+                var result = await Mediator.Send(request);
+                return OkResponse(result);
             }
             catch (Exception ex)
             {
