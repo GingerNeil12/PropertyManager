@@ -17,4 +17,8 @@
     <ProjectReference Include="..\PropertyManager.ViewModels\PropertyManager.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Landlords\Queries\GetLandlordDetails\" />
+  </ItemGroup>
+
 </Project>
