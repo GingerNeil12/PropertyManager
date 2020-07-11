@@ -85,19 +85,31 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public IActionResult Details(string id)
+        public async Task<IActionResult> Details(string id)
         {
             try
             {
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
-
+                var response = await HttpClient.GetAsync(
+                    $"{Configuration["Url:DetailLandlord"]}/{id}");
+                var responseBody = await response.Content.ReadAsStringAsync();
+                switch(response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        var okResponse = Deserialize<OkApiResponse>(responseBody);
+                        var landlordDetailViewModel = Deserialize<LandlordDetailViewModel>(
+                            okResponse.Result.ToString());
+                        return View(landlordDetailViewModel);
+                    case HttpStatusCode.NotFound:
+                        return RedirectToAction("index", "landlord");
+                    default:
+                        return View(new LandlordDetailViewModel());
+                }
             }
             catch (Exception)
             {
-
                 throw;
             }
-            return View();
         }
 
         [HttpGet]
