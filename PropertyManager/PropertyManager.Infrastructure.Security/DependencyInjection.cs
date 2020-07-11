@@ -39,7 +39,7 @@ namespace PropertyManager.Infrastructure.Security
                     {
                         OnAuthenticationFailed = context =>
                         {
-                            if(context.Exception is SecurityTokenExpiredException)
+                            if (context.Exception is SecurityTokenExpiredException)
                             {
                                 context.Response.Headers.Add("RefreshToken", "true");
                             }
@@ -71,6 +71,7 @@ namespace PropertyManager.Infrastructure.Security
             // Project wide DI
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IUserService, UserService>();
 
             return services;
         }

@@ -6,5 +6,6 @@ namespace PropertyManager.Application.Common.Interfaces
     public interface IIdentityService
     {
         Task<string> AuthenticateUserAsync(LoginViewModel model);
+        Task<string> GetUsersNameByIdAsync(string id);
     }
 }
