@@ -12,5 +12,6 @@
         public string ApprovalStatus { get; set; }
         public string ApprovalStatusBy { get; set; }
         public string ApprovalStatusOn { get; set; }
+        public string ActiveStatus { get; set; }
     }
 }
