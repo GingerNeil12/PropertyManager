@@ -3,4 +3,92 @@
     ViewData["Title"] = "Landlord Details";
 }
 
-<h1>Details</h1>
+<h1>@Model.FullName</h1>
+
+<dl class="row mt-3">
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Mobile Phone</dt>
+    <dd class="col-sm-9">@Model.MobilePhone</dd>
+
+    <dt class="col-sm-3">Home Phone</dt>
+    <dd class="col-sm-9">@Model.HomePhone</dd>
+
+    <dt class="col-sm-3">Contact Address</dt>
+    <dd class="col-sm-9">ADDRESS GOES HERE</dd>
+
+    <dt class="col-sm-3">Approval Status</dt>
+    @if (Model.ApprovalStatus == "APPROVED")
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-success badge-pill">Approved</span>
+        </dd>
+    }
+    else if (Model.ApprovalStatus == "SUBMITTED")
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-info badge-pill">Submitted</span>
+        </dd>
+    }
+    else
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-danger badge-pill">Rejected</span>
+        </dd>
+    }
+
+    @if (Model.ApprovalStatus == "APPROVED")
+    {
+        <dt class="col-sm-3">Approved By</dt>
+    }
+    else if (Model.ApprovalStatus == "SUBMITTED")
+    {
+        <dt class="col-sm-3">Submitted By</dt>
+    }
+    else
+    {
+        <dt class="col-sm-3">Rejected By</dt>
+    }
+    <dd class="col-sm-9">@Model.ApprovalStatusBy</dd>
+
+    @if (Model.ApprovalStatus == "APPROVED")
+    {
+        <dt class="col-sm-3">Approved On</dt>
+    }
+    else if (Model.ApprovalStatus == "SUBMITTED")
+    {
+        <dt class="col-sm-3">Submitted On</dt>
+    }
+    else
+    {
+        <dt class="col-sm-3">Rejected On</dt>
+    }
+    <dd class="col-sm-9">@Model.ApprovalStatusOn</dd>
+
+    <dt class="col-sm-3">Register Number</dt>
+    <dd class="col-sm-9">@Model.RegisterNumber</dd>
+
+    <dt class="col-sm-3">Date of Birth</dt>
+    <dd class="col-sm-9">@Model.Dob</dd>
+
+    <dt class="col-sm-3">Active Status</dt>
+    @if (Model.ActiveStatus == "ACTIVE")
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-success badge-pill">Active</span>
+        </dd>
+    }
+    else if (Model.ActiveStatus == "ARCHIVED")
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-info badge-pill">Archived</span>
+        </dd>
+    }
+    else
+    {
+        <dd class="col-sm-9">
+            <span class="badge badge-danger badge-pill">Deleted</span>
+        </dd>
+    }
+</dl>
