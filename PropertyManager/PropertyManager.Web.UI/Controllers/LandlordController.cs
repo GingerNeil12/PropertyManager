@@ -102,6 +102,7 @@ namespace PropertyManager.Web.UI.Controllers
                         return View(landlordDetailViewModel);
                     case HttpStatusCode.NotFound:
                         return RedirectToAction("index", "landlord");
+                    case HttpStatusCode.InternalServerError:
                     default:
                         return View(new LandlordDetailViewModel());
                 }
