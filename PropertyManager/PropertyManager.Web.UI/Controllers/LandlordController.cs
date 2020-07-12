@@ -14,6 +14,7 @@ using PropertyManager.ViewModels.Application.Common;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordsActivity;
 
 namespace PropertyManager.Web.UI.Controllers
 {
@@ -105,6 +106,49 @@ namespace PropertyManager.Web.UI.Controllers
                     case HttpStatusCode.InternalServerError:
                     default:
                         return View(new LandlordDetailViewModel());
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public async Task<IActionResult> LoadActivitesData(string landlordId)
+        {
+            try
+            {
+                var draw = Request.Form["draw"].FirstOrDefault();
+
+                var request = new GetLandlordActivityRequest()
+                {
+                    LandlordId = landlordId,
+                    Filter = CreateFilterDto()
+                };
+                var content = CreateContent(request);
+                HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+                var response = await HttpClient.PostAsync(
+                    Configuration["Url:LandlordActivities"], 
+                    content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                switch(response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        var okResponse = Deserialize<OkApiResponse>(responseBody);
+                        var viewModel = Deserialize<LandlordActivityViewModel>(
+                            okResponse.Result.ToString());
+                        return Json(new 
+                        {
+                            draw,
+                            recordsFiltered = viewModel.TotalRecords,
+                            recordsTotal = viewModel.TotalRecords,
+                            data = viewModel.Activity
+                        });
+                    case HttpStatusCode.InternalServerError:
+                    default:
+                        return null;
                 }
             }
             catch (Exception)
