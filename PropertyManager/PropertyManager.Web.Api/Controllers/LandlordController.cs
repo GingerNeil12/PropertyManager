@@ -6,6 +6,7 @@ using PropertyManager.ResponseModels;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordsActivity;
 using PropertyManager.Web.Api.Interfaces.Application;
 
 namespace PropertyManager.Web.Api.Controllers
@@ -64,6 +65,20 @@ namespace PropertyManager.Web.Api.Controllers
             {
                 var request = new GetLandlordDetailRequest() { LandlordId = id };
                 var result = await _landlordService.GetLandlordDetailsAsync(request);
+                return StatusCode(result.Status, result.Payload);
+            }
+            return GetBadRequestResult();
+        }
+
+        [HttpPost]
+        [Route("activities")]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public async Task<IActionResult> GetLandlordActivitiesAsync(
+            [FromBody] GetLandlordActivityRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _landlordService.GetLandlordActivitiesAsync(request);
                 return StatusCode(result.Status, result.Payload);
             }
             return GetBadRequestResult();
