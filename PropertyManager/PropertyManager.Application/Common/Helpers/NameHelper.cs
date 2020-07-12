@@ -40,7 +40,7 @@ namespace PropertyManager.Application.Common.Helpers
             result.Append($"{firstName.CapitalizeFirstLetter()} ");
             if(!string.IsNullOrWhiteSpace(middleNames))
             {
-                result.Append($"{middleNames} ");
+                result.Append($"{middleNames.CapitalizeFirstLetter()} ");
             }
             result.Append($"{lastName.CapitalizeFirstLetter()}");
             return result.ToString();

@@ -13,6 +13,13 @@ namespace PropertyManager.Testing.Domain.Extensions
         }
 
         [Test]
+        public void CapitalizeFirstLetter_WorksOnMultipleStrings()
+        {
+            var data = "hello world";
+            Assert.AreEqual("Hello World", data.CapitalizeFirstLetter());
+        }
+
+        [Test]
         public void GetFirstLetters_WorksWithSingleString()
         {
             var data = "hello";
