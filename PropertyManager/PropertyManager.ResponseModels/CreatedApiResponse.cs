@@ -6,6 +6,8 @@ namespace PropertyManager.ResponseModels
     {
         public object Id { get; private set; }
 
+        public string IdString => Id.ToString();
+
         public CreatedApiResponse(object id, string title = null)
             : base((int)HttpStatusCode.Created, title)
         {

@@ -76,7 +76,7 @@ namespace PropertyManager.Web.UI.Controllers
         private async Task OkResponse(string responseBody)
         {
             var okResponse = Deserialize<OkApiResponse>(responseBody);
-            await _authCookie.Create(okResponse.Result.ToString());
+            await _authCookie.Create(okResponse.ResultString);
         }
 
         private void BadRequestResponse(string responseBody)

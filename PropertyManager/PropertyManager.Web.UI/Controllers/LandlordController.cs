@@ -6,12 +6,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using PropertyManager.Domain.Enums;
 using PropertyManager.Infrastructure.Security.Common;
-using PropertyManager.ResponseModels;
-using PropertyManager.ViewModels.Application.Common;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
@@ -56,12 +53,11 @@ namespace PropertyManager.Web.UI.Controllers
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
                 var url = $"{Configuration["Url:UserLandlords"]}/{GetUserId()}";
                 var response = await HttpClient.PostAsync(url, content);
-                var responseBody = await response.Content.ReadAsStringAsync();
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
-                        var okResponse = Deserialize<OkApiResponse>(responseBody);
-                        var data = Deserialize<UserLandlordsViewModel>(okResponse.Result.ToString());
+                        var okResponse = await response.GetOkResponseAsync();
+                        var data = Deserialize<UserLandlordsViewModel>(okResponse.ResultString);
                         return Json(new
                         {
                             draw,
@@ -69,9 +65,10 @@ namespace PropertyManager.Web.UI.Controllers
                             recordsTotal = data.TotalRecords,
                             data = data.Landlords
                         });
+
                     case HttpStatusCode.InternalServerError:
                     default:
-                        return Json(new 
+                        return Json(new
                         {
                             draw,
                             recordsFiltered = 0,
@@ -95,19 +92,18 @@ namespace PropertyManager.Web.UI.Controllers
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
                 var response = await HttpClient.GetAsync(
                     $"{Configuration["Url:DetailLandlord"]}/{id}");
-                var responseBody = await response.Content.ReadAsStringAsync();
-                switch(response.StatusCode)
+                switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
-                        var okResponse = Deserialize<OkApiResponse>(responseBody);
+                        var okResponse = await response.GetOkResponseAsync();
                         var landlordDetailViewModel = Deserialize<LandlordDetailViewModel>(
-                            okResponse.Result.ToString());
+                            okResponse.ResultString);
                         return View(landlordDetailViewModel);
+
                     case HttpStatusCode.NotFound:
-                        return RedirectToAction("index", "landlord");
                     case HttpStatusCode.InternalServerError:
                     default:
-                        return View(new LandlordDetailViewModel());
+                        return RedirectToAction("index", "landlord");
                 }
             }
             catch (Exception)
@@ -119,17 +115,17 @@ namespace PropertyManager.Web.UI.Controllers
         [HttpPost]
         [Authorize(Roles = RoleNames.ADMIN)]
         public async Task<IActionResult> LoadDetailsData(
-            string landlordId, 
+            string landlordId,
             string dataType)
         {
             try
             {
                 var draw = Request.Form["draw"].FirstOrDefault();
-                switch(dataType)
+                switch (dataType)
                 {
                     case "activities":
                         var activities = await GetLandlordActivities(landlordId);
-                        return Json(new 
+                        return Json(new
                         {
                             draw,
                             recordsFiltered = activities.TotalRecords,
@@ -162,13 +158,13 @@ namespace PropertyManager.Web.UI.Controllers
             var content = CreateContent(request);
             HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
             var response = await HttpClient.PostAsync(
-                Configuration["LandlordActivities"], 
+                Configuration["LandlordActivities"],
                 content);
-            switch(response.StatusCode)
+            switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    var okResponse = await response.Content.GetOkResponseAsync();
-                    var result = Deserialize<LandlordActivityViewModel>(okResponse.Result.ToString());
+                    var okResponse = await response.GetOkResponseAsync();
+                    var result = Deserialize<LandlordActivityViewModel>(okResponse.ResultString);
                     return result;
 
                 default:
@@ -200,24 +196,30 @@ namespace PropertyManager.Web.UI.Controllers
                     var response = await HttpClient.PostAsync(
                         Configuration["Url:CreateLandlord"],
                         content);
-                    var responseBody = await response.Content.ReadAsStringAsync();
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.Created:
-                            var createdResult = Deserialize<CreatedApiResponse>(responseBody);
-                            return RedirectToAction("Details", new { id = createdResult.Id.ToString() });
+                            var createdResult = await response.GetCreatedResponseAsync();
+                            return RedirectToAction("Details", new { id = createdResult.IdString });
+
                         case HttpStatusCode.BadRequest:
-                            var badRequestResult = Deserialize<BadRequestApiResponse>(responseBody);
+                            var badRequestResult = await response.GetBadRequestResponseAsync();
                             AddBadRequestErrorsToModelState(badRequestResult);
                             return View(request);
+
                         case HttpStatusCode.Unauthorized:
+                            var unauthorizedResponse = await response.GetUnauthorizedResponseAsync();
                             return View(request);
+
                         case HttpStatusCode.Forbidden:
+                            var forbiddenResponse = await response.GetForbiddenResponseAsync();
                             return View(request);
+
                         case HttpStatusCode.InternalServerError:
-                            var internalServerResult = Deserialize<InternalServerErrorApiResponse>(responseBody);
+                            var internalServerResult = await response.GetInternalServerErrorResponseAsync();
                             ViewData["Message"] = internalServerResult.Status;
                             return View(request);
+
                         default:
                             ViewData["Message"] = UNABLE_CREATE_LANDLORD;
                             return View(request);
