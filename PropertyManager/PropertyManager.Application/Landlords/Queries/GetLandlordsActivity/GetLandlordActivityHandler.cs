@@ -34,7 +34,6 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlordsActivity
                              {
                                  Id = activity.Id,
                                  Action = activity.Action,
-                                 Description = activity.Description,
                                  HappenedOn = activity.HappenedOn.ToStandardDateTimeString(),
                                  UserName = activity.UserId
                              };

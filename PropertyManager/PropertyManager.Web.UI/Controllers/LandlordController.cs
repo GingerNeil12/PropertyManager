@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using PropertyManager.Domain.Enums;
 using PropertyManager.Infrastructure.Security.Common;
@@ -15,6 +16,7 @@ using PropertyManager.ViewModels.Application.Landlords.Commands;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordsActivity;
+using PropertyManager.Web.UI.Extensions;
 
 namespace PropertyManager.Web.UI.Controllers
 {
@@ -48,7 +50,7 @@ namespace PropertyManager.Web.UI.Controllers
                 {
                     UserId = GetUserId(),
                     ApprovalStatus = (ApprovalStatus)Enum.Parse(typeof(ApprovalStatus), approvalStatus),
-                    Filters = CreateFilterDto()
+                    Filters = GetFilterDto()
                 };
                 var content = CreateContent(request);
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
@@ -116,44 +118,65 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public async Task<IActionResult> LoadActivitesData(string landlordId)
+        public async Task<IActionResult> LoadDetailsData(
+            string landlordId, 
+            string dataType)
         {
             try
             {
                 var draw = Request.Form["draw"].FirstOrDefault();
-
-                var request = new GetLandlordActivityRequest()
+                switch(dataType)
                 {
-                    LandlordId = landlordId,
-                    Filter = CreateFilterDto()
-                };
-                var content = CreateContent(request);
-                HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
-                var response = await HttpClient.PostAsync(
-                    Configuration["Url:LandlordActivities"], 
-                    content);
-                var responseBody = await response.Content.ReadAsStringAsync();
-                switch(response.StatusCode)
-                {
-                    case HttpStatusCode.OK:
-                        var okResponse = Deserialize<OkApiResponse>(responseBody);
-                        var viewModel = Deserialize<LandlordActivityViewModel>(
-                            okResponse.Result.ToString());
+                    case "activities":
+                        var activities = await GetLandlordActivities(landlordId);
                         return Json(new 
                         {
                             draw,
-                            recordsFiltered = viewModel.TotalRecords,
-                            recordsTotal = viewModel.TotalRecords,
-                            data = viewModel.Activity
+                            recordsFiltered = activities.TotalRecords,
+                            recordsTotal = activities.TotalRecords,
+                            data = activities.Activity
                         });
-                    case HttpStatusCode.InternalServerError:
                     default:
-                        return null;
+                        return Json(new
+                        {
+                            draw,
+                            recordsFiltered = 0,
+                            recordsTotal = 0
+                        });
                 }
             }
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        private async Task<LandlordActivityViewModel> GetLandlordActivities(
+            string landlordId)
+        {
+            var request = new GetLandlordActivityRequest()
+            {
+                LandlordId = landlordId,
+                Filter = GetFilterDto()
+            };
+            var content = CreateContent(request);
+            HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+            var response = await HttpClient.PostAsync(
+                Configuration["LandlordActivities"], 
+                content);
+            switch(response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    var okResponse = await response.Content.GetOkResponseAsync();
+                    var result = Deserialize<LandlordActivityViewModel>(okResponse.Result.ToString());
+                    return result;
+
+                default:
+                    return new LandlordActivityViewModel()
+                    {
+                        TotalRecords = 0,
+                        Activity = new List<LandlordActivityDto>()
+                    };
             }
         }
 
@@ -209,7 +232,7 @@ namespace PropertyManager.Web.UI.Controllers
             return View(request);
         }
 
-        private FilterDto CreateFilterDto()
+        private FilterDto GetFilterDto()
         {
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
