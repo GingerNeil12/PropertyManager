@@ -232,34 +232,6 @@ namespace PropertyManager.Web.UI.Controllers
             return View(request);
         }
 
-        private FilterDto GetFilterDto()
-        {
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            var orderColumn = Request.Form["order[0][column]"].FirstOrDefault();
-            var sortColumn = Request.Form["columns[" + orderColumn + "][name]"].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-            var skip = start != null ? Convert.ToInt32(start) : 0;
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-
-            if (sortColumn == "LandlordId")
-            {
-                sortColumn = "LastName";
-            }
-
-            var result = new FilterDto()
-            {
-                Skip = skip,
-                PageSize = pageSize,
-                SortColumn = sortColumn,
-                SortDirection = sortColumnDirection,
-                SearchValue = searchValue
-            };
-            return result;
-        }
-
         private UserLandlordsViewModel GetEmptyUserLandlordsViewModel()
         {
             return new UserLandlordsViewModel()
