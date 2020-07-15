@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyManager.ResponseMod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyManager.Infrastructure.Persistence", "PropertyManager.Infrastructure.Persistence\PropertyManager.Infrastructure.Persistence.csproj", "{ECABB07A-06F5-4E3D-8D54-19326B8DDA83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyManager.Web.Api", "PropertyManager.Web.Api\PropertyManager.Web.Api.csproj", "{F34781C9-46C2-4D16-A013-C4F8DCA2004C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyManager.Web.Api", "PropertyManager.Web.Api\PropertyManager.Web.Api.csproj", "{F34781C9-46C2-4D16-A013-C4F8DCA2004C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyManager.Web.UI", "PropertyManager.Web.UI\PropertyManager.Web.UI.csproj", "{8261AB72-7D89-43C3-A0D1-DEC439AA0C4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyManager.Web.UI", "PropertyManager.Web.UI\PropertyManager.Web.UI.csproj", "{8261AB72-7D89-43C3-A0D1-DEC439AA0C4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
