@@ -112,7 +112,7 @@ namespace PropertyManager.Web.UI.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Authorize(Roles = RoleNames.ADMIN)]
         public async Task<IActionResult> LoadDetailsData(
             string landlordId,
