@@ -138,7 +138,7 @@
                     <th>Id</th>
                     <th class="no-sort">Action</th>
                     <th>Happened On</th>
-                    <th>UserName</th>
+                    <th class="no-sort">UserName</th>
                 </tr>
             </thead>
         </table>
@@ -159,8 +159,8 @@
                 },
                 "ajax": {
                     "url": "/landlord/LoadDetailsData?landlordId=" + landlordId + "&dataType=activities",
-                    "type": "GET",
-                    "datatype": "application/json"
+                    "type": "POST",
+                    "datatype": "json"
                 },
                 "columnDefs": [{
                     "targets": [0],
@@ -173,7 +173,11 @@
                     "searchable": false
                 }],
                 "columns": [
-                    { "data": "", "name":"", "autoWidth": true}
+                    { "data": "id", "name": "Id", autoWidth: true },
+                    { "data": "action", "name": "Action", autoWidth: true },
+                    { "data": "happenedOn", "name": "Happened On", autoWidth: true },
+                    { "data": "userName", "name":"UserName", autoWidth: true}
+
                 ]
             });
         });

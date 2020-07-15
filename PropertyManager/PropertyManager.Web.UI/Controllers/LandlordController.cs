@@ -112,7 +112,7 @@ namespace PropertyManager.Web.UI.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Authorize(Roles = RoleNames.ADMIN)]
         public async Task<IActionResult> LoadDetailsData(
             string landlordId,
@@ -158,7 +158,7 @@ namespace PropertyManager.Web.UI.Controllers
             var content = CreateContent(request);
             HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
             var response = await HttpClient.PostAsync(
-                Configuration["LandlordActivities"],
+                Configuration["Url:LandlordActivities"],
                 content);
             switch (response.StatusCode)
             {

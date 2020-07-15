@@ -38,16 +38,14 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlordsActivity
                                  UserName = activity.UserId
                              };
 
-            foreach (var activity in activities)
-            {
-                activity.UserName = await _identityService.GetUsersNameByIdAsync(activity.UserName);
-            }
-
             var sortColumn = request.Filter.SortColumn;
             var sortDirection = request.Filter.SortDirection;
-            if(!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
+            if(sortColumn != "Id")
             {
-                activities = activities.OrderBy(sortColumn + " " + sortDirection);
+                if (!IsSortColumnAndDirectionEmpty(sortColumn, sortDirection))
+                {
+                    activities = activities.OrderBy(sortColumn + " " + sortDirection);
+                }
             }
 
             var searchValue = request.Filter.SearchValue?.ToUpper();
@@ -60,9 +58,16 @@ namespace PropertyManager.Application.Landlords.Queries.GetLandlordsActivity
 
             var totalRecords = activities.Count();
             activities = activities.Skip(request.Filter.Skip).Take(request.Filter.PageSize);
+            var activitiesDto = activities.ToList();
+
+            foreach (var activity in activitiesDto)
+            {
+                activity.UserName = await _identityService.GetUsersNameByIdAsync(activity.UserName);
+            }
+
             var result = new LandlordActivityViewModel()
             {
-                Activity = activities,
+                Activity = activitiesDto,
                 TotalRecords = totalRecords
             };
             return result;
