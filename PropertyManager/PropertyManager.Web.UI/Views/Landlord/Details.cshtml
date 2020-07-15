@@ -1,5 +1,185 @@
-﻿@{
-    ViewData["Title"] = "Details";
+﻿@model PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails.LandlordDetailViewModel
+@{
+    ViewData["Title"] = "Landlord Details";
 }
 
-<h1>Details</h1>
+<h1>@Model.FullName</h1>
+<p>@Model.FullNameExtended</p>
+<input hidden asp-for="@Model.LandlordId" id="landlordId" />
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="properties-tab" data-toggle="tab" href="#properties" role="tab" aria-controls="properties" aria-selected="false">Properties</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">Notes</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="activity-tab" data-toggle="tab" href="#activity" role="tab" aria-controls="activity" aria-selected="false">Activity</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active mt-3" id="general" role="tabpanel" aria-labelledby="general-tab">
+        <h4>Contact Details</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Mobile Phone</dt>
+            <dd class="col-sm-9">@Model.MobilePhone</dd>
+
+            <dt class="col-sm-3">Home Phone</dt>
+            <dd class="col-sm-9">@Model.HomePhone</dd>
+
+            <dt class="col-sm-3">Contact Address</dt>
+            <dd class="col-sm-9">ADDRESS GOES HERE</dd>
+        </dl>
+        <hr />
+        <h4>Approval Details</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">Approval Status</dt>
+            @if (Model.ApprovalStatus == "APPROVED")
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-success badge-pill">Approved</span>
+                </dd>
+            }
+            else if (Model.ApprovalStatus == "SUBMITTED")
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-info badge-pill">Submitted</span>
+                </dd>
+            }
+            else
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-danger badge-pill">Rejected</span>
+                </dd>
+            }
+
+            @if (Model.ApprovalStatus == "APPROVED")
+            {
+                <dt class="col-sm-3">Approved By</dt>
+            }
+            else if (Model.ApprovalStatus == "SUBMITTED")
+            {
+                <dt class="col-sm-3">Submitted By</dt>
+            }
+            else
+            {
+                <dt class="col-sm-3">Rejected By</dt>
+            }
+            <dd class="col-sm-9">@Model.ApprovalStatusBy</dd>
+
+            @if (Model.ApprovalStatus == "APPROVED")
+            {
+                <dt class="col-sm-3">Approved On</dt>
+            }
+            else if (Model.ApprovalStatus == "SUBMITTED")
+            {
+                <dt class="col-sm-3">Submitted On</dt>
+            }
+            else
+            {
+                <dt class="col-sm-3">Rejected On</dt>
+            }
+            <dd class="col-sm-9">@Model.ApprovalStatusOn</dd>
+        </dl>
+        <hr />
+        <h4>Misc</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">Register Number</dt>
+            <dd class="col-sm-9">@Model.RegisterNumber</dd>
+
+            <dt class="col-sm-3">Date of Birth</dt>
+            <dd class="col-sm-9">@Model.Dob</dd>
+
+            <dt class="col-sm-3">Active Status</dt>
+            @if (Model.ActiveStatus == "ACTIVE")
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-success badge-pill">Active</span>
+                </dd>
+            }
+            else if (Model.ActiveStatus == "ARCHIVED")
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-info badge-pill">Archived</span>
+                </dd>
+            }
+            else
+            {
+                <dd class="col-sm-9">
+                    <span class="badge badge-danger badge-pill">Deleted</span>
+                </dd>
+            }
+        </dl>
+    </div>
+    <div class="tab-pane fade" id="properties" role="tabpanel" aria-labelledby="properties-tab">
+        PROPERTIES COMING SOON
+    </div>
+    <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+        NOTES COMING SOON
+    </div>
+    <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="docuemnts-tab">
+        DOCUMENTS COMING SOON
+    </div>
+    <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+        <h4 class="mt-3">Activity</h4>
+        <table id="landlordActivity" class="mt-3 table-striped table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th class="no-sort">Action</th>
+                    <th>Happened On</th>
+                    <th class="no-sort">UserName</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var landlordId = $('#landlordId').val();
+            $('#landlordActivity').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "language": {
+                    "search": "Search Action or UserName"
+                },
+                "ajax": {
+                    "url": "/landlord/LoadDetailsData?landlordId=" + landlordId + "&dataType=activities",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columnDefs": [{
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false
+                },
+                {
+                    "targets": 'no-sort',
+                    "orderable": false,
+                    "searchable": false
+                }],
+                "columns": [
+                    { "data": "id", "name": "Id", autoWidth: true },
+                    { "data": "action", "name": "Action", autoWidth: true },
+                    { "data": "happenedOn", "name": "Happened On", autoWidth: true },
+                    { "data": "userName", "name":"UserName", autoWidth: true}
+
+                ]
+            });
+        });
+    </script>
+}

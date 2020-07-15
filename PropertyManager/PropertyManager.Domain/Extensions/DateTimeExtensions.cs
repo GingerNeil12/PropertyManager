@@ -6,12 +6,12 @@ namespace PropertyManager.Domain.Extensions
     {
         public static string ToStandardDateString(this DateTime dateTime)
         {
-            return dateTime.ToString("yyyy-MM-dd");
+            return dateTime.ToString("dd-MM-yyyy");
         }
 
         public static string ToStandardDateTimeString(this DateTime dateTime)
         {
-            return dateTime.ToString("yyyy-MM-dd HH:mm");
+            return dateTime.ToString("dd-MM-yyyy HH:mm");
         }
     }
 }

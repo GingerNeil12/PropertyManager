@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using PropertyManager.Domain.Enums;
 using PropertyManager.Infrastructure.Security.Common;
-using PropertyManager.ResponseModels;
-using PropertyManager.ViewModels.Application.Common;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordDetails;
 using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlords;
+using PropertyManager.ViewModels.Application.Landlords.Queries.GetLandlordsActivity;
+using PropertyManager.Web.UI.Extensions;
 
 namespace PropertyManager.Web.UI.Controllers
 {
@@ -46,18 +47,17 @@ namespace PropertyManager.Web.UI.Controllers
                 {
                     UserId = GetUserId(),
                     ApprovalStatus = (ApprovalStatus)Enum.Parse(typeof(ApprovalStatus), approvalStatus),
-                    Filters = CreateFilterDto()
+                    Filters = GetFilterDto()
                 };
                 var content = CreateContent(request);
                 HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
                 var url = $"{Configuration["Url:UserLandlords"]}/{GetUserId()}";
                 var response = await HttpClient.PostAsync(url, content);
-                var responseBody = await response.Content.ReadAsStringAsync();
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
-                        var okResponse = Deserialize<OkApiResponse>(responseBody);
-                        var data = Deserialize<UserLandlordsViewModel>(okResponse.Result.ToString());
+                        var okResponse = await response.GetOkResponseAsync();
+                        var data = Deserialize<UserLandlordsViewModel>(okResponse.ResultString);
                         return Json(new
                         {
                             draw,
@@ -65,9 +65,10 @@ namespace PropertyManager.Web.UI.Controllers
                             recordsTotal = data.TotalRecords,
                             data = data.Landlords
                         });
+
                     case HttpStatusCode.InternalServerError:
                     default:
-                        return Json(new 
+                        return Json(new
                         {
                             draw,
                             recordsFiltered = 0,
@@ -84,9 +85,95 @@ namespace PropertyManager.Web.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNames.ADMIN)]
-        public IActionResult Details(string id)
+        public async Task<IActionResult> Details(string id)
         {
-            return View();
+            try
+            {
+                HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+                var response = await HttpClient.GetAsync(
+                    $"{Configuration["Url:DetailLandlord"]}/{id}");
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        var okResponse = await response.GetOkResponseAsync();
+                        var landlordDetailViewModel = Deserialize<LandlordDetailViewModel>(
+                            okResponse.ResultString);
+                        return View(landlordDetailViewModel);
+
+                    case HttpStatusCode.NotFound:
+                    case HttpStatusCode.InternalServerError:
+                    default:
+                        return RedirectToAction("index", "landlord");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = RoleNames.ADMIN)]
+        public async Task<IActionResult> LoadDetailsData(
+            string landlordId,
+            string dataType)
+        {
+            try
+            {
+                var draw = Request.Form["draw"].FirstOrDefault();
+                switch (dataType)
+                {
+                    case "activities":
+                        var activities = await GetLandlordActivities(landlordId);
+                        return Json(new
+                        {
+                            draw,
+                            recordsFiltered = activities.TotalRecords,
+                            recordsTotal = activities.TotalRecords,
+                            data = activities.Activity
+                        });
+                    default:
+                        return Json(new
+                        {
+                            draw,
+                            recordsFiltered = 0,
+                            recordsTotal = 0
+                        });
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task<LandlordActivityViewModel> GetLandlordActivities(
+            string landlordId)
+        {
+            var request = new GetLandlordActivityRequest()
+            {
+                LandlordId = landlordId,
+                Filter = GetFilterDto()
+            };
+            var content = CreateContent(request);
+            HttpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+            var response = await HttpClient.PostAsync(
+                Configuration["Url:LandlordActivities"],
+                content);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    var okResponse = await response.GetOkResponseAsync();
+                    var result = Deserialize<LandlordActivityViewModel>(okResponse.ResultString);
+                    return result;
+
+                default:
+                    return new LandlordActivityViewModel()
+                    {
+                        TotalRecords = 0,
+                        Activity = new List<LandlordActivityDto>()
+                    };
+            }
         }
 
         [HttpGet]
@@ -109,24 +196,30 @@ namespace PropertyManager.Web.UI.Controllers
                     var response = await HttpClient.PostAsync(
                         Configuration["Url:CreateLandlord"],
                         content);
-                    var responseBody = await response.Content.ReadAsStringAsync();
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.Created:
-                            var createdResult = Deserialize<CreatedApiResponse>(responseBody);
-                            return RedirectToAction("Details", new { id = createdResult.Id.ToString() });
+                            var createdResult = await response.GetCreatedResponseAsync();
+                            return RedirectToAction("Details", new { id = createdResult.IdString });
+
                         case HttpStatusCode.BadRequest:
-                            var badRequestResult = Deserialize<BadRequestApiResponse>(responseBody);
+                            var badRequestResult = await response.GetBadRequestResponseAsync();
                             AddBadRequestErrorsToModelState(badRequestResult);
                             return View(request);
+
                         case HttpStatusCode.Unauthorized:
+                            var unauthorizedResponse = await response.GetUnauthorizedResponseAsync();
                             return View(request);
+
                         case HttpStatusCode.Forbidden:
+                            var forbiddenResponse = await response.GetForbiddenResponseAsync();
                             return View(request);
+
                         case HttpStatusCode.InternalServerError:
-                            var internalServerResult = Deserialize<InternalServerErrorApiResponse>(responseBody);
+                            var internalServerResult = await response.GetInternalServerErrorResponseAsync();
                             ViewData["Message"] = internalServerResult.Status;
                             return View(request);
+
                         default:
                             ViewData["Message"] = UNABLE_CREATE_LANDLORD;
                             return View(request);
@@ -139,34 +232,6 @@ namespace PropertyManager.Web.UI.Controllers
                 }
             }
             return View(request);
-        }
-
-        private FilterDto CreateFilterDto()
-        {
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            var orderColumn = Request.Form["order[0][column]"].FirstOrDefault();
-            var sortColumn = Request.Form["columns[" + orderColumn + "][name]"].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-            var skip = start != null ? Convert.ToInt32(start) : 0;
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-
-            if (sortColumn == "LandlordId")
-            {
-                sortColumn = "LastName";
-            }
-
-            var result = new FilterDto()
-            {
-                Skip = skip,
-                PageSize = pageSize,
-                SortColumn = sortColumn,
-                SortDirection = sortColumnDirection,
-                SearchValue = searchValue
-            };
-            return result;
         }
 
         private UserLandlordsViewModel GetEmptyUserLandlordsViewModel()

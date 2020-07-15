@@ -30,6 +30,8 @@ namespace PropertyManager.Web.Api.Services
                     return BadRequestResponse(validation.Errors, validation.Message);
                 case DbContextException dbContext:
                     return InternalServerErrorResponse(dbContext.Message);
+                case NotFoundException notFound:
+                    return NotFoundResponse(notFound.Message);
                 default:
                     return InternalServerErrorResponse();
             }

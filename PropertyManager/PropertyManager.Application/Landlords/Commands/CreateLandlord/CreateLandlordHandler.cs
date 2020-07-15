@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using PropertyManager.Application.Common.Interfaces;
 using PropertyManager.Application.Exceptions;
 using PropertyManager.Domain.Enums;
+using PropertyManager.Domain.Extensions;
 using PropertyManager.Domain.Models.Landlords;
 using PropertyManager.ViewModels.Application.Landlords.Commands;
 
@@ -47,10 +48,10 @@ namespace PropertyManager.Application.Landlords.Commands.CreateLandlord
             var landlord = new Landlord()
             {
                 Id = Guid.NewGuid().ToString(),
-                Title = request.Title,
-                FirstName = request.FirstName,
-                MiddleNames = request.MiddleNames,
-                LastName = request.LastName,
+                Title = request.Title.CapitalizeFirstLetter(),
+                FirstName = request.FirstName.CapitalizeFirstLetter(),
+                MiddleNames = request.MiddleNames.CapitalizeFirstLetter(),
+                LastName = request.LastName.CapitalizeFirstLetter(),
                 Email = request.Email,
                 MobilePhone = request.MobilePhone,
                 HomePhone = request.HomePhone,
